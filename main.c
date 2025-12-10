@@ -8,6 +8,7 @@ uint16_t window_height;
 uint32_t *frame_buffer;
 
 void change_pixel_colour(uint16_t x, uint16_t y, uint32_t colour);
+
 int main(){
 
 	XEvent event;
@@ -24,6 +25,19 @@ int main(){
 	XSelectInput(display, window, KeyPressMask);
 
 	frame_buffer = malloc(window_width*window_height*4);
+	
+	XImage *img = XCreateImage(
+    display,
+    DefaultVisual(display, 0),   // just default visual
+    DefaultDepth(display, 0),    // just default depth 
+    ZPixmap,                     // format (for colour this is the best)
+    0,                            // offset
+    (char*)frame_buffer,         // the framebuffer
+    window_width, window_height, // width & height
+    32,                           // bitmap_pad (32 bits per scanline)
+    window_width * 4              // bytes per line (apparently also can leave it with 0 and x11 computes it)
+);
+
 
 	while(1){
 		XNextEvent(display, &event);
@@ -36,7 +50,8 @@ int main(){
 
 
 	return 1;
-	}
+}
+
 void change_pixel_colour(uint16_t x, uint16_t y, uint32_t colour){
 		frame_buffer[y*window_width+x] = colour;	
 }
