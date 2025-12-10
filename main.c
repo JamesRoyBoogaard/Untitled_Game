@@ -22,7 +22,7 @@ int main(){
 	uint8_t border_width = 1;
 	Window window = XCreateSimpleWindow(display,XDefaultRootWindow(display),50,50, window_width, window_height, border_width, XBlackPixel(display, 0), XWhitePixel(display, 0));
 	XMapWindow(display,window);
-	XSelectInput(display, window, KeyPressMask);
+	XSelectInput(display, window, KeyPressMask|ExposureMask);
 
 	frame_buffer = malloc(window_width*window_height*4);
 	
@@ -38,13 +38,22 @@ int main(){
     window_width * 4              // bytes per line (apparently also can leave it with 0 and x11 computes it)
 );
 
+	for(uint16_t x = 0; x < window_width; x++){
+		for(uint16_t y = 0; y < window_height; y++){
+				change_pixel_colour(x , y, 0xFF00FF00);
+			}
+		}
 
 	while(1){
 		XNextEvent(display, &event);
 		switch (event.type) {
 			case KeyPress:
+				free(frame_buffer);
 				XCloseDisplay(display);
 				return 0;
+			case Expose:
+				XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
+				break;
 		}
 	}
 
