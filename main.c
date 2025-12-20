@@ -6,8 +6,11 @@
 uint16_t window_width;
 uint16_t window_height;
 uint32_t *frame_buffer;
+uint32_t *mc_sprite;
 
 void change_pixel_colour(uint16_t x, uint16_t y, uint32_t colour);
+Bool is_sky(uint16_t x, uint16_t y);
+void draw_sprite(uint16_t height, uint16_t width, uint32_t colour, uint16_t x_pos, uint16_t y_pos);
 
 int main(){
 
@@ -25,6 +28,7 @@ int main(){
 	XSelectInput(display, window, KeyPressMask|ExposureMask);
 
 	frame_buffer = malloc(window_width*window_height*4);
+	mc_sprite = malloc(32*32*4);	
 	
 	XImage *img = XCreateImage(
     display,
@@ -34,14 +38,19 @@ int main(){
     0,                            // offset
     (char*)frame_buffer,         // the framebuffer
     window_width, window_height, // width & height
-    32,                           // bitmap_pad (32 bits per scanline)
+    32,                           // bitmap_pad (32 bits per scanline
     window_width * 4              // bytes per line (apparently also can leave it with 0 and x11 computes it)
 );
 
 	for(uint16_t x = 0; x < window_width; x++){
 		for(uint16_t y = 0; y < window_height; y++){
-				change_pixel_colour(x , y, 0xFF00FF00);
+		if(is_sky(x, y)){
+			change_pixel_colour(x , y, 0xFF00FF00);
+	
+			}else{
+				change_pixel_colour(x,y, 0x00000000);
 			}
+		}
 		}
 
 	while(1){
@@ -63,4 +72,19 @@ int main(){
 
 void change_pixel_colour(uint16_t x, uint16_t y, uint32_t colour){
 		frame_buffer[y*window_width+x] = colour;	
+}
+
+
+Bool is_sky(uint16_t x, uint16_t y){
+	Bool is_sky; 
+	if(y<=250){
+		return False;
+	}else{
+		return True;
+	}
+}
+
+
+void draw_sprite(uint16_t height, uint16_t width, uint32_t colour, uint16_t x_pos, uint16_t y_pos){
+
 }
