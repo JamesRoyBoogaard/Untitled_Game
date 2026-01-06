@@ -8,6 +8,13 @@ uint16_t window_height;
 uint32_t *frame_buffer;
 uint32_t *mc_sprite;
 
+struct sprite_position{
+	uint16_t x; 
+	uint16_t y;
+}sprite_position;
+
+struct sprite_position warrior_pos;
+
 struct sprite{
 	uint16_t height;
 	uint16_t width;
@@ -27,7 +34,7 @@ int main(){
 	if(!display){
 		fprintf(stderr, "No display server could be found");
 	}
-
+	
 	window_width = 500;
 	window_height = 500;
 	uint8_t border_width = 1;
@@ -49,6 +56,7 @@ int main(){
     32,                           // bitmap_pad (32 bits per scanline
     window_width * 4              // bytes per line (apparently also can leave it with 0 and x11 computes it)
 );
+
 
 	for(uint16_t x = 0; x < window_width; x++){
 		for(uint16_t y = 0; y < window_height; y++){
@@ -101,6 +109,12 @@ Bool draw_sprite(uint16_t x_pos, uint16_t y_pos){
 	uint16_t height, width = 50;
 	uint32_t colour = 0xFF00FF00;
 	// Essentially going to check if the current pixel is within the sprite or not. Then i guess we draw the sprite
+	if(warrior_pos.x == NULL){
+		warrior_pos.x = 100;
+		warrior_pos.y = 100;
+
+	}
+
 	if(x_pos){
 		
 	}
