@@ -15,14 +15,6 @@ struct sprite_position{
 
 struct sprite_position warrior_pos;
 
-struct sprite{
-	uint16_t height;
-	uint16_t width;
-	uint32_t colour;
-	uint16_t x_pos;
-	uint16_t y_pos;
-};
-
 void change_pixel_colour(uint16_t x, uint16_t y, uint32_t colour);
 Bool is_sky(uint16_t x, uint16_t y);
 Bool draw_sprite(uint16_t x_pos, uint16_t y_pos);
@@ -60,18 +52,13 @@ int main(){
 
 	for(uint16_t x = 0; x < window_width; x++){
 		for(uint16_t y = 0; y < window_height; y++){
-
-		if(draw_sprite(x,y)){
-
-		}
-		if(is_sky(x, y)){
-			change_pixel_colour(x , y, 0xFF00FF00);
-	
-			}else{
+			if(draw_sprite(x,y)){
+				change_pixel_colour(x , y, 0xFF00FF00);
+		}else{
 				change_pixel_colour(x,y, 0x00000000);
 			}
 		}
-		}
+	}
 
 	while(1){
 		XNextEvent(display, &event);
@@ -92,7 +79,6 @@ void change_pixel_colour(uint16_t x, uint16_t y, uint32_t colour){
 		frame_buffer[y*window_width+x] = colour;	
 }
 
-
 Bool is_sky(uint16_t x, uint16_t y){
 	Bool is_sky; 
 	if(y<=250){
@@ -102,21 +88,23 @@ Bool is_sky(uint16_t x, uint16_t y){
 	}
 }
 
-
-
 Bool draw_sprite(uint16_t x_pos, uint16_t y_pos){ 
 	// There is a current x and y position for the sprite which all other pixels in the sprite then are referenced from.
-	uint16_t height, width = 50;
-	uint32_t colour = 0xFF00FF00;
-	// Essentially going to check if the current pixel is within the sprite or not. Then i guess we draw the sprite
-	if(warrior_pos.x == NULL){
+	static Bool initialised = False;
+	uint16_t warrior_height = 50;
+	uint16_t warrior_width = 50;
+	if(!initialised){
 		warrior_pos.x = 100;
 		warrior_pos.y = 100;
-
+		initialised = True;
 	}
 
-	if(x_pos){
-		
+	uint32_t colour = 0xFF00FF00;
+	// Essentially going to check if the current pixel is within the sprite or not. Then i guess we draw the sprite
+	if(x_pos >= warrior_pos.x && x_pos <= warrior_pos.x + warrior_width 
+			&& y_pos<= warrior_pos.y && y_pos >= warrior_pos.y - warrior_height){
+			return True;
 	}
-	return True;
+	//Also need to account for the warrior_pos x and y never being less than 50 pixel from the border (within our 500X500 block/frame)
+	return False;
 }
