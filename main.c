@@ -2,22 +2,24 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 uint16_t window_width;
 uint16_t window_height;
 uint32_t *frame_buffer;
-uint32_t *mc_sprite;
 
-struct sprite_position{
+typedef struct {
 	uint16_t x; 
 	uint16_t y;
-}sprite_position;
+} Sprite_Position;
 
-struct sprite_position warrior_pos;
+static Sprite_Position warrior_pos;
 
 void change_pixel_colour(uint16_t x, uint16_t y, uint32_t colour);
 Bool is_sky(uint16_t x, uint16_t y);
 Bool draw_sprite(uint16_t x_pos, uint16_t y_pos);
+void move_sprite(Sprite_Position *sprite_pos);
+void render();
 
 int main(){
 
@@ -32,10 +34,9 @@ int main(){
 	uint8_t border_width = 1;
 	Window window = XCreateSimpleWindow(display,XDefaultRootWindow(display),50,50, window_width, window_height, border_width, XBlackPixel(display, 0), XWhitePixel(display, 0));
 	XMapWindow(display,window);
-	XSelectInput(display, window, KeyPressMask|ExposureMask);
+	XSelectInput(display, window, KeyPressMask|ExposureMask|KeyReleaseMask);
 
 	frame_buffer = malloc(window_width*window_height*4);
-	mc_sprite = malloc(32*32*4);	
 	
 	XImage *img = XCreateImage(
     display,
@@ -48,25 +49,24 @@ int main(){
     32,                           // bitmap_pad (32 bits per scanline
     window_width * 4              // bytes per line (apparently also can leave it with 0 and x11 computes it)
 );
-
-
-	for(uint16_t x = 0; x < window_width; x++){
-		for(uint16_t y = 0; y < window_height; y++){
-			if(draw_sprite(x,y)){
-				change_pixel_colour(x , y, 0xFF00FF00);
-		}else{
-				change_pixel_colour(x,y, 0x00000000);
-			}
-		}
-	}
-
+	render();
 	while(1){
 		XNextEvent(display, &event);
 		switch (event.type) {
 			case KeyPress:
-				free(frame_buffer);
-				XCloseDisplay(display);
-				return 0;
+        if (XLookupKeysym(&event.xkey, 0) == XK_w )  {
+						move_sprite(&warrior_pos);
+						render();
+		    }if (XLookupKeysym(&event.xkey, 0) == XK_Escape){
+						free(frame_buffer);
+						XCloseDisplay(display);
+						return 0;
+				}
+				XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
+			//	free(frame_buffer);
+			//	XCloseDisplay(display);
+			//	return 0;
+				break;
 			case Expose:
 				XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 				break;
@@ -86,6 +86,23 @@ Bool is_sky(uint16_t x, uint16_t y){
 	}else{
 		return True;
 	}
+}
+
+void render(){
+	
+	for(uint16_t x = 0; x < window_width; x++){
+		for(uint16_t y = 0; y < window_height; y++){
+			if(draw_sprite(x,y)){
+				change_pixel_colour(x , y, 0xFF00FF00);
+		}else{
+				change_pixel_colour(x,y, 0x00000000);
+			}
+		}
+	}
+}
+
+void move_sprite(Sprite_Position *sprite){
+			sprite->x += 20;
 }
 
 Bool draw_sprite(uint16_t x_pos, uint16_t y_pos){ 
