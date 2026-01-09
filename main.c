@@ -18,7 +18,7 @@ static Sprite_Position warrior_pos;
 void change_pixel_colour(uint16_t x, uint16_t y, uint32_t colour);
 Bool is_sky(uint16_t x, uint16_t y);
 Bool draw_sprite(uint16_t x_pos, uint16_t y_pos);
-void move_sprite(Sprite_Position *sprite_pos);
+void move_sprite(Sprite_Position *sprite_pos, KeySym keysym);
 void render();
 
 int main(){
@@ -54,18 +54,15 @@ int main(){
 		XNextEvent(display, &event);
 		switch (event.type) {
 			case KeyPress:
-        if (XLookupKeysym(&event.xkey, 0) == XK_w )  {
-						move_sprite(&warrior_pos);
+        if (XLookupKeysym(&event.xkey, 0) != XK_Escape )  {
+						move_sprite(&warrior_pos, XLookupKeysym(&event.xkey, 0)); 
 						render();
-		    }if (XLookupKeysym(&event.xkey, 0) == XK_Escape){
-						free(frame_buffer);
-						XCloseDisplay(display);
-						return 0;
+				}else{
+							free(frame_buffer);
+							XCloseDisplay(display);
+							return 0;
 				}
 				XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
-			//	free(frame_buffer);
-			//	XCloseDisplay(display);
-			//	return 0;
 				break;
 			case Expose:
 				XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
@@ -89,7 +86,6 @@ Bool is_sky(uint16_t x, uint16_t y){
 }
 
 void render(){
-	
 	for(uint16_t x = 0; x < window_width; x++){
 		for(uint16_t y = 0; y < window_height; y++){
 			if(draw_sprite(x,y)){
@@ -101,8 +97,23 @@ void render(){
 	}
 }
 
-void move_sprite(Sprite_Position *sprite){
-			sprite->x += 20;
+void move_sprite(Sprite_Position *sprite, KeySym keysym){
+	switch (keysym){
+		case XK_w:
+			sprite->y = sprite->y - 5;
+			break;
+		case XK_a:
+			sprite->x = sprite->x - 5;
+			break;
+		case XK_d:
+			sprite->x = sprite->x + 5;
+			break;
+		case XK_s:
+			sprite->y = sprite->y + 5;
+			break;
+	}
+			printf("x position: %d \n",sprite->x);
+			printf("y position: %d \n",sprite->y);
 }
 
 Bool draw_sprite(uint16_t x_pos, uint16_t y_pos){ 
@@ -111,8 +122,8 @@ Bool draw_sprite(uint16_t x_pos, uint16_t y_pos){
 	uint16_t warrior_height = 50;
 	uint16_t warrior_width = 50;
 	if(!initialised){
-		warrior_pos.x = 100;
-		warrior_pos.y = 100;
+		warrior_pos.x = 300;
+		warrior_pos.y = 200;
 		initialised = True;
 	}
 
