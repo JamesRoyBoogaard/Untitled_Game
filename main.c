@@ -3,11 +3,13 @@
 #include <stdint.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
+#include <time.h>
 
 uint16_t window_width;
 uint16_t window_height;
 uint32_t *frame_buffer;
 
+struct timespec start, end;
 typedef struct {
 	uint16_t x; 
 	uint16_t y;
@@ -32,6 +34,7 @@ int main(){
 	window_width = 500;
 	window_height = 500;
 	uint8_t border_width = 1;
+	
 	Window window = XCreateSimpleWindow(display,XDefaultRootWindow(display),50,50, window_width, window_height, border_width, XBlackPixel(display, 0), XWhitePixel(display, 0));
 	XMapWindow(display,window);
 	XSelectInput(display, window, KeyPressMask|ExposureMask|KeyReleaseMask);
@@ -49,8 +52,14 @@ int main(){
     32,                           // bitmap_pad (32 bits per scanline
     window_width * 4              // bytes per line (apparently also can leave it with 0 and x11 computes it)
 );
+
 	render();
 	while(1){
+
+		clock_gettime(CLOCK_MONOTONIC, &start);
+		clock_gettime(CLOCK_MONOTONIC, &end);
+
+		//Then using the start and end to calc everything that happens each frame and sleep the difference
 		XNextEvent(display, &event);
 		switch (event.type) {
 			case KeyPress:
