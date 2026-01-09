@@ -112,8 +112,6 @@ void move_sprite(Sprite_Position *sprite, KeySym keysym){
 			sprite->y = sprite->y + 5;
 			break;
 	}
-			printf("x position: %d \n",sprite->x);
-			printf("y position: %d \n",sprite->y);
 }
 
 Bool draw_sprite(uint16_t x_pos, uint16_t y_pos){ 
