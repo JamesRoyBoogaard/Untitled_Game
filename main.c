@@ -55,10 +55,7 @@ int main(){
 
 	render();
 	while(1){
-
 		clock_gettime(CLOCK_MONOTONIC, &start);
-		clock_gettime(CLOCK_MONOTONIC, &end);
-
 		//Then using the start and end to calc everything that happens each frame and sleep the difference
 		XNextEvent(display, &event);
 		switch (event.type) {
@@ -76,6 +73,10 @@ int main(){
 			case Expose:
 				XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 				break;
+		}
+		clock_gettime(CLOCK_MONOTONIC, &end);
+		if(((float)end.tv_nsec/1000000) - ((float)start.tv_nsec/1000000) >= 33.3){
+			printf("33.3 milliseconds have passed \n");
 		}
 	}
 	return 1;
