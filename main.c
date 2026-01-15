@@ -8,8 +8,10 @@
 uint16_t window_width;
 uint16_t window_height;
 uint32_t *frame_buffer;
+uint8_t *time_passed; 
 
 struct timespec start, end;
+struct timespec sleep_time;
 typedef struct {
 	uint16_t x; 
 	uint16_t y;
@@ -58,13 +60,18 @@ int main(){
 // Let split into timer, render, input handling. 
 	render();
 	while(1){
-		clock_gettime(CLOCK_MONOTONIC, &start);
-		input_handling(display, &window , img, &event); // try figure out how to now poll this. So every frame check for an input adn then move on and sleep the difference
-		clock_gettime(CLOCK_MONOTONIC, &end);	
-		if(((float)end.tv_nsec/1000000) - ((float)start.tv_nsec/1000000) >= 33.3){
-			printf("33.3 milliseconds have passed \n");
+		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
+		if(XEventsQueued(display, QueuedAlready) > 0){
+			input_handling(display, &window , img, &event); // try figure out how to now poll this. So every frame check for an input adn then move on and sleep the difference
 		}
-	}
+		clock_gettime(CLOCK_MONOTONIC, &end);	// Got the end time
+		// Then we start a blocking loop that checks if the time has been 33.3 ms, if not it sleeps it and if so then it creates the frame buffer and displays it
+		*time_passed = (end.tv_nsec/1000000)-(start.tv_nsec/1000000);
+		sleep_time.tv_nsec = 10000;
+		if(*time_passed < 33){
+			nanosleep(&sleep_time, NULL);
+		}
+	}	
 	return 1;
 }
 
@@ -108,28 +115,27 @@ void move_sprite(Sprite_Position *sprite, KeySym keysym){
 			sprite->y = sprite->y + 5;
 			break;
 	}
+	render();
 }
 
 uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *event ){
 
-			XNextEvent(display, event); // This is a blocking event so i need to figure out how to poll it instead 
+			XNextEvent(display, event); // This is a blocking event so i need to figure out how to check whether somehow if there is an event queued and then perform it and move on. 
 			switch (event -> type) {
 
 				case KeyPress:
 					if (XLookupKeysym(&event -> xkey, 0) != XK_Escape )  {
 							move_sprite(&warrior_pos, XLookupKeysym(&event -> xkey, 0)); 
-							render();
+							//render();
 					}else{
 								free(frame_buffer);
 								XCloseDisplay(display);
 								return 0;
 					}
 					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
-					clock_gettime(CLOCK_MONOTONIC, &end);
 					break;
 				case Expose:
 					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
-					clock_gettime(CLOCK_MONOTONIC, &end);
 					break;
 			}
 
