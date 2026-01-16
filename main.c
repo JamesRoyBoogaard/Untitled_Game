@@ -8,10 +8,12 @@
 uint16_t window_width;
 uint16_t window_height;
 uint32_t *frame_buffer;
-uint8_t *time_passed; 
+int time_passed; 
+int frame_time = 33000000;
 
 struct timespec start, end;
 struct timespec sleep_time;
+
 typedef struct {
 	uint16_t x; 
 	uint16_t y;
@@ -44,6 +46,7 @@ int main(){
 	XSelectInput(display, window, KeyPressMask|ExposureMask|KeyReleaseMask);
 
 	frame_buffer = malloc(window_width*window_height*4);
+	frame_time = 33000000;	
 	
 	XImage *img = XCreateImage(
     display,
@@ -61,23 +64,26 @@ int main(){
 	render();
 	while(1){
 		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
-		if(XEventsQueued(display, QueuedAlready) > 0){
-			input_handling(display, &window , img, &event); // try figure out how to now poll this. So every frame check for an input adn then move on and sleep the difference
+		if(XEventsQueued(display, QueuedAfterFlush) > 0){
+			input_handling(display, &window , img, &event); 
+			// try figure out how to now poll this. So every frame check for an input adn then move on and sleep the difference
+																											
+			clock_gettime(CLOCK_MONOTONIC, &end);	
+			// Got the end time Then we start a blocking loop that checks if the time has been 33.3 ms, if not it sleeps it and if so then it creates the frame buffer and displays it 
+																											
+			time_passed = (end.tv_nsec/1000000)-(start.tv_nsec/1000000);
+																										
+			if(time_passed < frame_time){
+				sleep_time.tv_nsec = frame_time - time_passed; nanosleep(&sleep_time, NULL); }
 		}
-		clock_gettime(CLOCK_MONOTONIC, &end);	// Got the end time
-		// Then we start a blocking loop that checks if the time has been 33.3 ms, if not it sleeps it and if so then it creates the frame buffer and displays it
-		*time_passed = (end.tv_nsec/1000000)-(start.tv_nsec/1000000);
-		sleep_time.tv_nsec = 10000;
-		if(*time_passed < 33){
-			nanosleep(&sleep_time, NULL);
-		}
-	}	
-	return 1;
-}
+	}
+		return 1; 
+	}
 
-void change_pixel_colour(uint16_t x, uint16_t y, uint32_t colour){
-		frame_buffer[y*window_width+x] = colour;	
-}
+
+	void change_pixel_colour(uint16_t x, uint16_t y, uint32_t colour){
+		frame_buffer[y*window_width+x] = colour;
+	}
 
 Bool is_sky(uint16_t x, uint16_t y){
 	Bool is_sky; 
@@ -122,7 +128,6 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 
 			XNextEvent(display, event); // This is a blocking event so i need to figure out how to check whether somehow if there is an event queued and then perform it and move on. 
 			switch (event -> type) {
-
 				case KeyPress:
 					if (XLookupKeysym(&event -> xkey, 0) != XK_Escape )  {
 							move_sprite(&warrior_pos, XLookupKeysym(&event -> xkey, 0)); 
