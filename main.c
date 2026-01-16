@@ -67,15 +67,17 @@ int main(){
 		if(XEventsQueued(display, QueuedAfterFlush) > 0){
 			input_handling(display, &window , img, &event); 
 			// try figure out how to now poll this. So every frame check for an input adn then move on and sleep the difference
-																											
+			}																					
 			clock_gettime(CLOCK_MONOTONIC, &end);	
 			// Got the end time Then we start a blocking loop that checks if the time has been 33.3 ms, if not it sleeps it and if so then it creates the frame buffer and displays it 
 																											
 			time_passed = (end.tv_nsec/1000000)-(start.tv_nsec/1000000);
 																										
 			if(time_passed < frame_time){
-				sleep_time.tv_nsec = frame_time - time_passed; nanosleep(&sleep_time, NULL); }
-		}
+				sleep_time.tv_nsec = frame_time - time_passed;
+				nanosleep(&sleep_time, NULL);
+			}
+		
 	}
 		return 1; 
 	}
