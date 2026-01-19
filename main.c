@@ -133,7 +133,6 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 				case KeyPress:
 					if (XLookupKeysym(&event -> xkey, 0) != XK_Escape )  {
 							move_sprite(&warrior_pos, XLookupKeysym(&event -> xkey, 0)); 
-							//render();
 							XSync(display, True);
 					}else{
 								free(frame_buffer);
