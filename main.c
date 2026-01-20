@@ -30,7 +30,6 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 
 
 int main(){
-
 	XEvent event;
 	Display *display = XOpenDisplay(NULL); 
 	if(!display){
@@ -126,13 +125,13 @@ void move_sprite(Sprite_Position *sprite, KeySym keysym){
 }
 
 uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *event ){
-
 			XNextEvent(display, event); // This is a blocking event so i need to figure out how to check whether somehow if there is an event queued and then perform it and move on. 
 			switch (event -> type) {
 				case KeyPress:
 					if (XLookupKeysym(&event -> xkey, 0) != XK_Escape )  {
 							move_sprite(&warrior_pos, XLookupKeysym(&event -> xkey, 0)); 
-							XSync(display, True);
+
+							//XSync(display, True);
 					}else{
 								free(frame_buffer);
 								XCloseDisplay(display);
