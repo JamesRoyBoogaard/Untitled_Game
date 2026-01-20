@@ -10,7 +10,6 @@ uint16_t window_height;
 uint32_t *frame_buffer;
 int time_passed; 
 int frame_time = 33000000;
-Bool pressed_esc = False;
 
 struct timespec start, end;
 struct timespec sleep_time;
@@ -32,7 +31,6 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 
 int main(){
 	Display *display = XOpenDisplay(NULL); 
-	//XSetCloseDownMode(display, );
 	if(!display){
 		fprintf(stderr, "No display server could be found");
 	}
@@ -65,13 +63,26 @@ int main(){
 		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
 																						
 		if(XPending(display) > 0){ // XEventsQueued(display, QueuedAfterFlush) is identical to XPending(display)
-				input_handling(display, &window , img, &event); 
-				if(pressed_esc){
-					free(frame_buffer);
-					XCloseDisplay(display);	
-				}
-		}
-																									
+			//	input_handling(display, &window , img, &event); 
+			XNextEvent(display, &event); // This is a blocking event so i need to figure out how to check whether somehow if there is an event queued and then perform it and move on. 
+			switch (event.type) {
+				case KeyPress:
+					if (XLookupKeysym(&event.xkey, 0) != XK_Escape )  {
+							move_sprite(&warrior_pos, XLookupKeysym(&event.xkey, 0)); 
+							XSync(display, True);
+					}else{
+								free(frame_buffer);
+								XCloseDisplay(display);
+								return 0;
+					}
+					XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
+					break;
+				case Expose:
+					XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
+					break;
+			}
+			return 0;
+		}																							
 		clock_gettime(CLOCK_MONOTONIC, &end);	
 
 		// Got the end time Then we start a blocking loop that checks if the time has been 33.3 ms, if not it sleeps it and if so then it creates the frame buffer and displays it 
@@ -84,6 +95,7 @@ int main(){
 	}
 		return 1; 
 	}
+
 
 	void change_pixel_colour(uint16_t x, uint16_t y, uint32_t colour){
 		frame_buffer[y*window_width+x] = colour;
@@ -130,19 +142,14 @@ void move_sprite(Sprite_Position *sprite, KeySym keysym){
 
 uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *event){
 			XNextEvent(display, event); // This is a blocking event so i need to figure out how to check whether somehow if there is an event queued and then perform it and move on. 
-			switch (event->type) {
+			switch (event -> type) {
 				case KeyPress:
-					if (XLookupKeysym(&event->xkey, 0) != XK_Escape )  {
-							move_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0)); 
+					if (XLookupKeysym(&event -> xkey, 0) != XK_Escape )  {
+							move_sprite(&warrior_pos, XLookupKeysym(&event -> xkey, 0)); 
 							XSync(display, True);
 					}else{
-								pressed_esc = True;
-							//	event = NULL;
-							//	img = NULL;
-							//	window = NULL;
-							//	display = NULL;
-							//	free(frame_buffer);
-							//	XCloseDisplay(display);	
+								free(frame_buffer);
+								XCloseDisplay(display);
 								return 0;
 					}
 					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
