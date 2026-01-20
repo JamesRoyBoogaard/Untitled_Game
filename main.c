@@ -46,7 +46,7 @@ int main(){
 	XSelectInput(display, window, KeyPressMask|ExposureMask|KeyReleaseMask);
 
 	frame_buffer = malloc(window_width*window_height*4);
-	frame_time = 33000000;	
+	
 	
 	XImage *img = XCreateImage(
     display,
@@ -65,9 +65,7 @@ int main(){
 	while(1){
 		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
 		if(XEventsQueued(display, QueuedAfterFlush) > 0){
-
 				input_handling(display, &window , img, &event); 
-			// try figure out how to now poll this. So every frame check for an input adn then move on and sleep the difference
 		}																							
 		//	while(XPending(display)){
 			clock_gettime(CLOCK_MONOTONIC, &end);	
@@ -76,6 +74,7 @@ int main(){
 			if(time_passed < frame_time){
 				sleep_time.tv_nsec = frame_time - time_passed;
 				nanosleep(&sleep_time, NULL);
+				time_passed = 0;
 			}
 		
 	}
