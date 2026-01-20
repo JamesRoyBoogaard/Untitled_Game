@@ -9,7 +9,7 @@ uint16_t window_width;
 uint16_t window_height;
 uint32_t *frame_buffer;
 int time_passed; 
-int frame_time = 33;
+int frame_time = 33000000;
 
 struct timespec start, end;
 struct timespec sleep_time;
@@ -130,8 +130,7 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 				case KeyPress:
 					if (XLookupKeysym(&event -> xkey, 0) != XK_Escape )  {
 							move_sprite(&warrior_pos, XLookupKeysym(&event -> xkey, 0)); 
-
-							//XSync(display, True);
+							XSync(display, True);
 					}else{
 								free(frame_buffer);
 								XCloseDisplay(display);
