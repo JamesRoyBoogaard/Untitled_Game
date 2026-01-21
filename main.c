@@ -136,6 +136,7 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 							XSync(display, True);
 					}else{
 								pressed_esc = True;
+								XSync(display, True);
 								return 0;
 					}
 					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
