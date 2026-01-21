@@ -71,7 +71,6 @@ int main(){
 					XCloseDisplay(display);	
 				}
 		}
-																									
 		clock_gettime(CLOCK_MONOTONIC, &end);	
 
 		// Got the end time Then we start a blocking loop that checks if the time has been 33.3 ms, if not it sleeps it and if so then it creates the frame buffer and displays it 
@@ -137,12 +136,6 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 							XSync(display, True);
 					}else{
 								pressed_esc = True;
-							//	event = NULL;
-							//	img = NULL;
-							//	window = NULL;
-							//	display = NULL;
-							//	free(frame_buffer);
-							//	XCloseDisplay(display);	
 								return 0;
 					}
 					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
