@@ -10,7 +10,12 @@ uint16_t window_height;
 uint32_t *frame_buffer;
 int time_passed; 
 int frame_time = 33000000;
+
 Bool pressed_esc = False;
+Bool pressed_w = False;
+Bool pressed_a = False;
+Bool pressed_s = False;
+Bool pressed_d = False;
 
 struct timespec start, end;
 struct timespec sleep_time;
@@ -109,22 +114,28 @@ void render(){
 	}
 }
 
-void move_sprite(Sprite_Position *sprite, KeySym keysym){
-	
+void move_sprite(Sprite_Position *sprite, KeySym keysym){	
+	// need to check which type of event happened was it a release or a press?
+	// Once we determine that then at the end of the method we add 5 to every key direction listed as True or we False the specific key and direction removing it from the ongoing pressed keys
 	switch (keysym){
 		case XK_w:
-			sprite->y = sprite->y - 5;
+			pressed_w = True;
+			//sprite->y = sprite->y - 5;
 			break;
 		case XK_a:
-			sprite->x = sprite->x - 5;
+			pressed_a = True;
+			//sprite->x = sprite->x - 5;
 			break;
 		case XK_d:
-			sprite->x = sprite->x + 5;
+			pressed_d = True;
+			//sprite->x = sprite->x + 5;
 			break;
 		case XK_s:
-			sprite->y = sprite->y +5;
+			pressed_s = True;
+			//sprite->y = sprite->y +5;
 			break;
 	}
+
 	render();
 }
 
@@ -133,7 +144,7 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 			switch (event->type) {
 				case KeyPress:
 					if (XLookupKeysym(&event->xkey, 0) != XK_Escape )  {
-						pressed_esc = True;
+						move_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
 						XSync(display, True);
 						return 0;
 					}else{ 
@@ -145,8 +156,8 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 					break;
 				case KeyRelease:
 					// Set a global boolean called release in here
-					move_sprite(&warrior_pos, XLookupKeysym(&event -> xkey, 0)); // go into the move_sprite method and check for which key was released and stop adding to that direction
-																																			 // otherwise keey adding to the pressed direction
+					move_sprite(&warrior_pos, XLookupKeysym(&event -> xkey, 0));
+					// go into the move_sprite method and check for which key was released and stop adding to that direction otherwise keey adding to the pressed direction
 				case Expose:
 					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 					break;
