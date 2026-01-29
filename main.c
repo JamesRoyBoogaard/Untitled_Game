@@ -31,6 +31,7 @@ void change_pixel_colour(uint16_t x, uint16_t y, uint32_t colour);
 Bool is_sky(uint16_t x, uint16_t y);
 Bool draw_sprite(uint16_t x_pos, uint16_t y_pos);
 void move_sprite(Sprite_Position *sprite_pos, KeySym keysym);
+void stop_moving_sprite(Sprite_Position *sprite_pos, KeySym keysym);
 void render();
 uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *event);
 
@@ -139,6 +140,28 @@ void move_sprite(Sprite_Position *sprite, KeySym keysym){
 	render();
 }
 
+void stop_moving_sprite(Sprite_Position *sprite, KeySym keysym){
+	switch (keysym){
+		case XK_w:
+			pressed_w = False;
+			//sprite->y = sprite->y - 5;
+			break;
+		case XK_a:
+			pressed_a = False;
+			//sprite->x = sprite->x - 5;
+			break;
+		case XK_d:
+			pressed_d = False;
+			//sprite->x = sprite->x + 5;
+			break;
+		case XK_s:
+			pressed_s = False;
+			//sprite->y = sprite->y +5;
+			break;
+	}
+	//render();
+}
+
 uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *event){
 			XNextEvent(display, event); // This is a blocking event so i need to figure out how to check whether somehow if there is an event queued and then perform it and move on. 
 			switch (event->type) {
@@ -156,7 +179,9 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 					break;
 				case KeyRelease:
 					// Set a global boolean called release in here
-					move_sprite(&warrior_pos, XLookupKeysym(&event -> xkey, 0));
+					// move_sprite(&warrior_pos, XLookupKeysym(&event -> xkey, 0));
+					stop_moving_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
+					//probably goes here, maybe try fitting into one method but yeah not sure
 					// go into the move_sprite method and check for which key was released and stop adding to that direction otherwise keey adding to the pressed direction
 				case Expose:
 					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
