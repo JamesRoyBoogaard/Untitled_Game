@@ -4,6 +4,7 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <time.h>
+#include <stdbool.h>
 
 uint16_t window_width;
 uint16_t window_height;
@@ -16,6 +17,8 @@ Bool pressed_w = False;
 Bool pressed_a = False;
 Bool pressed_s = False;
 Bool pressed_d = False;
+
+int bool_size = 4;
 
 struct timespec start, end;
 struct timespec sleep_time;
@@ -46,6 +49,11 @@ int main(){
 	window_width = 500;
 	window_height = 500;
 	uint8_t border_width = 1;
+	bool *bool_list = malloc(bool_size * sizeof(bool));
+	bool_list[0] = pressed_w;
+	bool_list[1] = pressed_a;
+	bool_list[2] = pressed_s;
+	bool_list[3] = pressed_d;
 	
 	Window window = XCreateSimpleWindow(display,XDefaultRootWindow(display),50,50, window_width, window_height, border_width, XBlackPixel(display, 0), XWhitePixel(display, 0));
 	XMapWindow(display,window);
@@ -137,6 +145,9 @@ void move_sprite(Sprite_Position *sprite, KeySym keysym){
 			break;
 	}
 
+	for (int i = 0; i<bool_size; i++){
+
+	}
 	render();
 }
 
@@ -181,6 +192,7 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 					// Set a global boolean called release in here
 					// move_sprite(&warrior_pos, XLookupKeysym(&event -> xkey, 0));
 					stop_moving_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
+					break;
 					//probably goes here, maybe try fitting into one method but yeah not sure
 					// go into the move_sprite method and check for which key was released and stop adding to that direction otherwise keey adding to the pressed direction
 				case Expose:
