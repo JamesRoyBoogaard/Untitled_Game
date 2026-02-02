@@ -9,7 +9,7 @@
 uint16_t window_width;
 uint16_t window_height;
 uint32_t *frame_buffer;
-bool *keysum_list;
+uint32_t *keysum_list;
 int time_passed; 
 int frame_time = 33000000;
 
@@ -38,7 +38,7 @@ void move_sprite(Sprite_Position *sprite_pos, KeySym keysym);
 void stop_moving_sprite(Sprite_Position *sprite_pos, KeySym keysym);
 void render();
 uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *event);
-void move();
+void move(Sprite_Position *sprite_pos);
 
 int main(){
 	Display *display = XOpenDisplay(NULL); 
@@ -52,11 +52,7 @@ int main(){
 	uint8_t border_width = 1;
 
 	keysum_list = malloc(keysym_array_size * sizeof(KeySym));
-	keysum_list[0] = XK_w;
-	keysum_list[1] = XK_a;
-	keysum_list[2] = XK_s;
-	keysum_list[3] = XK_d;
-	
+
 	Window window = XCreateSimpleWindow(display,XDefaultRootWindow(display),50,50, window_width, window_height, border_width, XBlackPixel(display, 0), XWhitePixel(display, 0));
 	XMapWindow(display,window);
 	XSelectInput(display, window, KeyPressMask|ExposureMask|KeyReleaseMask);
@@ -131,34 +127,46 @@ void move_sprite(Sprite_Position *sprite, KeySym keysym){
 	switch (keysym){
 		case XK_w:
 			pressed_w = True;
-
+			keysum_list[0] = XK_w;
 			//sprite->y = sprite->y - 5;
 			break;
 		case XK_a:
 			pressed_a = True;
+			keysum_list[1] = XK_a;
 			//sprite->x = sprite->x - 5;
 			break;
-		case XK_d:
+		case XK_s:
 			pressed_d = True;
+			keysum_list[2] = XK_s;
 			//sprite->x = sprite->x + 5;
 			break;
-		case XK_s:
+		case XK_d:
 			pressed_s = True;
+			keysum_list[3] = XK_d;
 			//sprite->y = sprite->y +5;
 			break;
 	}
 
-	move();
+	move(sprite);
 
 	render();
 }
 
-void move(){
-	for (int i = 0; i < bool_size; i++){
-		if(bool_list[i]==True){
-			switch(bool_list[i]){
-
-			}	
+void move(Sprite_Position *sprite){
+	for (int i = 0; i < keysym_array_size; i++){
+		switch(keysum_list[i]){
+			case XK_w:
+				sprite->y = sprite-> y -5;
+				break;	
+			case XK_a:
+				sprite->x = sprite-> x - 5;
+				break;
+			case XK_s:
+				sprite->x = sprite->x + 5;
+				break;
+			case XK_d:
+				sprite->y = sprite->y +5;
+				break;
 		}
 	}
 }
@@ -166,8 +174,7 @@ void move(){
 void stop_moving_sprite(Sprite_Position *sprite, KeySym keysym){
 	switch (keysym){
 		case XK_w:
-			pressed_w = False;
-			//sprite->y = sprite->y - 5;
+			// Here we then set the different positions in the array to an unused key as a negative place holder	
 			break;
 		case XK_a:
 			pressed_a = False;
