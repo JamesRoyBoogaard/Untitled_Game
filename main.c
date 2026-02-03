@@ -75,7 +75,6 @@ int main(){
 	render();
 	while(1){
 		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
-																						
 		if(XPending(display) > 0){ // XEventsQueued(display, QueuedAfterFlush) is identical to XPending(display)
 				input_handling(display, &window , img, &event); 
 				if(pressed_esc){
@@ -170,15 +169,12 @@ void stop_moving_sprite(Sprite_Position *sprite, KeySym keysym){
 			break;
 		case XK_a:
 			keysum_list[1] = XK_p;
-			//sprite->x = sprite->x - 5;
 			break;
 		case XK_d:
 			keysum_list[2] = XK_p;
-			//sprite->x = sprite->x + 5;
 			break;
 		case XK_s:
 			keysum_list[3] = XK_p;
-			//sprite->y = sprite->y +5;
 			break;
 	}
 }
@@ -188,8 +184,8 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 			switch (event->type) {
 				case KeyPress:
 					if (XLookupKeysym(&event->xkey, 0) != XK_Escape )  {
-					//	move_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
-						move(&warrior_pos);
+						move_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
+				//	move(&warrior_pos);
 						XSync(display, True);
 						return 0;
 					}else{ 
