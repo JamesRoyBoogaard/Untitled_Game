@@ -148,16 +148,16 @@ void move(Sprite_Position *sprite){
 	for (int i = 0; i < keysym_array_size; i++){
 		switch(keysum_list[i]){
 			case XK_w:
-				sprite->y = sprite-> y -5;
+				sprite->y = sprite-> y - 5;
 				break;	
 			case XK_a:
 				sprite->x = sprite-> x - 5;
 				break;
 			case XK_s:
-				sprite->x = sprite->x + 5;
+				sprite->x = sprite->y + 5;
 				break;
 			case XK_d:
-				sprite->y = sprite->y +5;
+				sprite->y = sprite->x + 5;
 				break;
 			case XK_p:
 				break;
@@ -189,7 +189,6 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 				case KeyPress:
 					if (XLookupKeysym(&event->xkey, 0) != XK_Escape )  {
 						move_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
-				//	move(&warrior_pos);
 						XSync(display, True);
 					}else{ 
 						pressed_esc = True;
