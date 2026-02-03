@@ -52,6 +52,9 @@ int main(){
 	uint8_t border_width = 1;
 
 	keysum_list = malloc(keysym_array_size * sizeof(KeySym));
+	for(int key = 0; key < keysym_array_size; key++){
+		keysum_list[key] = XK_p;
+	}	
 
 	Window window = XCreateSimpleWindow(display,XDefaultRootWindow(display),50,50, window_width, window_height, border_width, XBlackPixel(display, 0), XWhitePixel(display, 0));
 	XMapWindow(display,window);
@@ -137,7 +140,6 @@ void move_sprite(Sprite_Position *sprite, KeySym keysym){
 			keysum_list[3] = XK_d;
 			break;
 	}
-
 	move(sprite);
 	render();
 }
@@ -156,6 +158,8 @@ void move(Sprite_Position *sprite){
 				break;
 			case XK_d:
 				sprite->y = sprite->y +5;
+				break;
+			case XK_p:
 				break;
 		}
 	}
@@ -187,7 +191,6 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 						move_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
 				//	move(&warrior_pos);
 						XSync(display, True);
-						return 0;
 					}else{ 
 						pressed_esc = True;
 						XSync(display, True);
