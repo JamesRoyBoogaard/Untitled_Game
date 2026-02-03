@@ -146,7 +146,6 @@ void move_sprite(Sprite_Position *sprite, KeySym keysym){
 			//sprite->y = sprite->y +5;
 			break;
 	}
-
 	move(sprite);
 
 	render();
@@ -174,18 +173,19 @@ void move(Sprite_Position *sprite){
 void stop_moving_sprite(Sprite_Position *sprite, KeySym keysym){
 	switch (keysym){
 		case XK_w:
-			// Here we then set the different positions in the array to an unused key as a negative place holder	
+			// Here we then set the different positions in the array to an unused key as a negative place holder (XK_p)	
+			keysum_list[0] = XK_p;
 			break;
 		case XK_a:
-			pressed_a = False;
+			keysum_list[0] = XK_p;
 			//sprite->x = sprite->x - 5;
 			break;
 		case XK_d:
-			pressed_d = False;
+			keysum_list[0] = XK_p;
 			//sprite->x = sprite->x + 5;
 			break;
 		case XK_s:
-			pressed_s = False;
+			keysum_list[0] = XK_p;
 			//sprite->y = sprite->y +5;
 			break;
 	}
