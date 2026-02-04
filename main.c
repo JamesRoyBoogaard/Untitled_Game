@@ -73,13 +73,13 @@ int main(){
     32,                           // bitmap_pad (32 bits per scanline
     window_width * 4              // bytes per line (apparently also can leave it with 0 and x11 computes it)
 );
-
-// Let split into timer, render, input handling. 
 	render();
 	while(1){
 		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
 		if(XPending(display) > 0){ // XEventsQueued(display, QueuedAfterFlush) is identical to XPending(display)
 				input_handling(display, &window , img, &event); 
+
+				 XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 				if(pressed_esc){
 					free(keysum_list);
 					free(frame_buffer);
@@ -193,16 +193,16 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 						pressed_esc = True;
 						return 0;
 					}
-					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
+//				 XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 					break;
 
 				case KeyRelease:
 					stop_moving_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
-					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
+					// XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 					break;
 
 				case Expose:
-					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
+//					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 					break;
 			}
 			return 0;
