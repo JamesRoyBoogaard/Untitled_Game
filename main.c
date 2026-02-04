@@ -81,6 +81,7 @@ int main(){
 		if(XPending(display) > 0){ // XEventsQueued(display, QueuedAfterFlush) is identical to XPending(display)
 				input_handling(display, &window , img, &event); 
 				if(pressed_esc){
+					free(keysum_list);
 					free(frame_buffer);
 					XCloseDisplay(display);	
 				}
@@ -91,6 +92,7 @@ int main(){
 		time_passed = (end.tv_nsec/1000000)-(start.tv_nsec/1000000);
 		if(time_passed < frame_time){
 			sleep_time.tv_nsec = frame_time - time_passed;
+			
 			nanosleep(&sleep_time, NULL);
 			time_passed = 0;
 		}			
@@ -154,10 +156,10 @@ void move(Sprite_Position *sprite){
 				sprite->x = sprite-> x - 5;
 				break;
 			case XK_s:
-				sprite->x = sprite->y + 5;
+				sprite->y = sprite-> y + 5;
 				break;
 			case XK_d:
-				sprite->y = sprite->x + 5;
+				sprite->x = sprite-> x + 5;
 				break;
 			case XK_p:
 				break;
@@ -189,10 +191,8 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 				case KeyPress:
 					if (XLookupKeysym(&event->xkey, 0) != XK_Escape )  {
 						move_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
-						XSync(display, True);
 					}else{ 
 						pressed_esc = True;
-						XSync(display, True);
 						return 0;
 					}
 					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
@@ -200,6 +200,7 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 
 				case KeyRelease:
 					stop_moving_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
+					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 					break;
 
 				case Expose:
