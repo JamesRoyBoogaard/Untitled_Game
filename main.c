@@ -92,7 +92,6 @@ int main(){
 		time_passed = (end.tv_nsec/1000000)-(start.tv_nsec/1000000);
 		if(time_passed < frame_time){
 			sleep_time.tv_nsec = frame_time - time_passed;
-			
 			nanosleep(&sleep_time, NULL);
 			time_passed = 0;
 		}			
@@ -161,10 +160,9 @@ void move(Sprite_Position *sprite){
 			case XK_d:
 				sprite->x = sprite-> x + 5;
 				break;
-			case XK_p:
-				break;
 		}
 	}
+	// We need to clear the queued somehow
 }
 
 void stop_moving_sprite(Sprite_Position *sprite, KeySym keysym){
@@ -172,16 +170,16 @@ void stop_moving_sprite(Sprite_Position *sprite, KeySym keysym){
 		case XK_w:
 			// Here we then set the different positions in the array to an unused key as a negative place holder (XK_p)	
 			keysum_list[0] = XK_p;
-			break;
+			//break;
 		case XK_a:
 			keysum_list[1] = XK_p;
-			break;
+			//break;
 		case XK_d:
 			keysum_list[2] = XK_p;
-			break;
+			//break;
 		case XK_s:
 			keysum_list[3] = XK_p;
-			break;
+		//	break;
 	}
 }
 
