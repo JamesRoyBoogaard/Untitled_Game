@@ -76,14 +76,16 @@ int main(){
 	render();
 	while(1){
 		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
-		if(XPending(display) > 0){ // XEventsQueued(display, QueuedAfterFlush) is identical to XPending(display)
+		while(XPending(display) > 0){ //XEventsQueued(display, QueuedAfterFlush) is identical to XPending(display)
 				input_handling(display, &window , img, &event); 
-
-				 XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 				if(pressed_esc){
 					free(keysum_list);
 					free(frame_buffer);
 					XCloseDisplay(display);	
+				}else{
+					move(&warrior_pos);
+					render();
+					XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 				}
 		}
 		clock_gettime(CLOCK_MONOTONIC, &end);	
@@ -103,15 +105,6 @@ int main(){
 		frame_buffer[y*window_width+x] = colour;
 	}
 
-Bool is_sky(uint16_t x, uint16_t y){
-	Bool is_sky; 
-	if(y<=250){
-		return False;
-	}else{
-		return True;
-	}
-}
-
 void render(){
 	for(uint16_t x = 0; x < window_width; x++){
 		for(uint16_t y = 0; y < window_height; y++){
@@ -125,8 +118,6 @@ void render(){
 }
 
 void move_sprite(Sprite_Position *sprite, KeySym keysym){	
-	// need to check which type of event happened was it a release or a press?
-	// Once we determine that then at the end of the method we add 5 to every key direction listed as True or we False the specific key and direction removing it from the ongoing pressed keys
 	switch (keysym){
 		case XK_w:
 			keysum_list[0] = XK_w;
@@ -141,8 +132,6 @@ void move_sprite(Sprite_Position *sprite, KeySym keysym){
 			keysum_list[3] = XK_d;
 			break;
 	}
-	move(sprite);
-	render();
 }
 
 void move(Sprite_Position *sprite){
@@ -162,29 +151,27 @@ void move(Sprite_Position *sprite){
 				break;
 		}
 	}
-	// We need to clear the queued somehow
 }
 
 void stop_moving_sprite(Sprite_Position *sprite, KeySym keysym){
 	switch (keysym){
 		case XK_w:
-			// Here we then set the different positions in the array to an unused key as a negative place holder (XK_p)	
 			keysum_list[0] = XK_p;
-			//break;
+			break;
 		case XK_a:
 			keysum_list[1] = XK_p;
-			//break;
-		case XK_d:
-			keysum_list[2] = XK_p;
-			//break;
+			break;
 		case XK_s:
+			keysum_list[2] = XK_p;
+			break;
+		case XK_d:
 			keysum_list[3] = XK_p;
-		//	break;
+			break;
 	}
 }
 
 uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *event){
-			XNextEvent(display, event); // This is a blocking event so i need to figure out how to check whether somehow if there is an event queued and then perform it and move on. 
+			XNextEvent(display, event); 
 			switch (event->type) {
 				case KeyPress:
 					if (XLookupKeysym(&event->xkey, 0) != XK_Escape )  {
@@ -193,16 +180,14 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 						pressed_esc = True;
 						return 0;
 					}
-//				 XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 					break;
 
 				case KeyRelease:
 					stop_moving_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
-					// XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 					break;
 
 				case Expose:
-//					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
+					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 					break;
 			}
 			return 0;
