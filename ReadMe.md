@@ -6,4 +6,15 @@ The setting is during the Anglo-Zulu war. A lone Zulu warrior has to fight off h
 
 Picture doom-slayer but from Africa. He is able to block and dodge bullets and can take troops out with one swing of his short spear.
 
-The creation of this game is an exercise in learning Nvim, low level game development and C/C++.
+The creation of this game is an exercise in learning Nvim, low level game development and C.
+
+## Requirements
+
+### Gameplay
+
+- Movement
+- Frame Rate
+- Enemies
+- Levels
+- Menus
+- Art

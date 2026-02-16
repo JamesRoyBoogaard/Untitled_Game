@@ -11,7 +11,7 @@ uint16_t window_height;
 uint32_t *frame_buffer;
 uint32_t *keysum_list;
 int time_passed; 
-int frame_time = 33000000;
+int frame_time = 30;
 
 Bool pressed_esc = False;
 Bool pressed_w = False;
@@ -25,8 +25,8 @@ struct timespec start, end;
 struct timespec sleep_time;
 
 typedef struct {
-	uint16_t x; 
-	uint16_t y;
+	float x; 
+	float y;
 } Sprite_Position;
 
 static Sprite_Position warrior_pos;
@@ -92,7 +92,7 @@ int main(){
 
 		// Got the end time Then we start a blocking loop that checks if the time has been 33.3 ms, if not it sleeps it and if so then it creates the frame buffer and displays it 
 		time_passed = (end.tv_nsec/1000000)-(start.tv_nsec/1000000);
-		if(time_passed < frame_time){
+		if(time_passed < frame_time * 1000000){
 			sleep_time.tv_nsec = frame_time - time_passed;
 			nanosleep(&sleep_time, NULL);
 			time_passed = 0;
