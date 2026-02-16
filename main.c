@@ -11,7 +11,7 @@ uint16_t window_height;
 uint32_t *frame_buffer;
 uint32_t *keys_pressed_list;
 int time_passed; 
-int frame_time = 30;
+const long frame_time = 33333333;
 
 int  keys_pressed_list_size = 4;
 
@@ -79,8 +79,9 @@ int main(){
 		move(&warrior_pos);
 		// Handle frame timing
 		clock_gettime(CLOCK_MONOTONIC,&end);	
-		time_passed = (end.tv_nsec/1000000) - (start.tv_nsec/1000000);
-		if(time_passed<frame_time*1000000){
+		time_passed = (end.tv_sec - start.tv_sec)*1000000000 + (end.tv_nsec - start.tv_nsec);
+		if(time_passed<frame_time){
+			sleep_time.tv_sec = 0;
 			sleep_time.tv_nsec = frame_time - time_passed;
 			nanosleep(&sleep_time, NULL);
 			time_passed = 0;
@@ -132,22 +133,22 @@ void move(Sprite_Position *sprite){
 		switch(i){
 			case 0 :
 				if(keys_pressed_list[i]){
-					net_distance_sprite_y-=1;
+					net_distance_sprite_y-=10;
 					break;	
 				}
 			case 1:
 				if(keys_pressed_list[i]){
-					net_distance_sprite_x-=1;
+					net_distance_sprite_x-=10;
 					break;
 				}
 			case 2: 
 				if(keys_pressed_list[i]){
-					net_distance_sprite_y+=1;
+					net_distance_sprite_y+=10;
 					break;
 				}
 			case 3:
 				if(keys_pressed_list[i]){
-					net_distance_sprite_x+=1;
+					net_distance_sprite_x+=10;
 					break;
 				}
 		}
