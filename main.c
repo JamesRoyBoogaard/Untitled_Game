@@ -73,7 +73,7 @@ int main(){
 		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
 		// Gather input
 		while(XPending(display) > 0){
-			input_handling(display, &window , img, &event); // Gain a list of inputs 
+			input_handling(display, &window , img, &event);  
 		}
 		// Execute input
 		move(&warrior_pos);
