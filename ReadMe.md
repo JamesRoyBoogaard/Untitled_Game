@@ -13,19 +13,19 @@ The creation of this game is an exercise in learning Nvim, low level game develo
 ### Gameplay
 
 #### Player<br>
-colour = green.
-form = square.
-speed = 2 pixels per frame.
-behaviour = The player will have a melee weapon which they can swing. This weapon kills enemies instantly. They players and all characters must have very tight, fast and consistent movement. 
+colour = green.<br>
+form = square.<br>
+speed = 2 pixels per frame.<br>
+behaviour = The player will have a melee weapon which they can swing. This weapon kills enemies instantly. They players and all characters must have very tight, fast and consistent movement.<br> 
 
 #### Fighting <br>
 The player can sustain 3 bullet from the enemy and there ranged attacks. The enemy dies instantly when hit within melee range by the player. 
 
 #### Enemies <br>
-colour = red.
-form = square.
-speed = half the players speed.
-behaviour = Once that are within 60 pixels of the player they will stop and start shooting yellow bullets at the player. 
+colour = red.<br>
+form = square.<br>
+speed = half the players speed.<br>
+behaviour = Once that are within 60 pixels of the player they will stop and start shooting yellow bullets at the player.<br> 
 
 #### Levels <br>
 The map is static and the enemies spawn from the sides randomly. There spawn rate ranges from 1 - 4 per second as the game continues.(to be dialed in as the game is tested) 
