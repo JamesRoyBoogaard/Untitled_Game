@@ -15,7 +15,7 @@ The creation of this game is an exercise in learning Nvim, low level game develo
 #### Player<br>
 colour = green.<br>
 form = square.<br>
-speed = 2 pixels per frame.<br>
+speed = 1 pixels per frame.<br>
 behaviour = The player will have a melee weapon which they can swing. This weapon kills enemies instantly. They players and all characters must have very tight, fast and consistent movement.<br> 
 
 #### Fighting <br>
