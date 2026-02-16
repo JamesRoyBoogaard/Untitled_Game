@@ -73,7 +73,7 @@ int main(){
 		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
 		// Gather input
 		while(XPending(display) > 0){
-			input_handling(display, &window , img, &event); //gain a list of inputs 
+			input_handling(display, &window , img, &event); // Gain a list of inputs 
 		}
 		// Execute input
 		move(&warrior_pos);
@@ -149,7 +149,7 @@ void move(Sprite_Position *sprite){
 				}
 			case 3:
 				//sprite->x = sprite-> x + 2;
-				if(keys_pressed_list[3]){
+				if(keys_pressed_list[i]){
 					net_distance_sprite_x+=2;
 					break;
 				}
