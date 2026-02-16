@@ -132,22 +132,22 @@ void move(Sprite_Position *sprite){
 		switch(i){
 			case 0 :
 				if(keys_pressed_list[i]){
-					net_distance_sprite_y-=2;
+					net_distance_sprite_y-=1;
 					break;	
 				}
 			case 1:
 				if(keys_pressed_list[i]){
-					net_distance_sprite_x-=2;
+					net_distance_sprite_x-=1;
 					break;
 				}
 			case 2: 
 				if(keys_pressed_list[i]){
-					net_distance_sprite_y+=2;
+					net_distance_sprite_y+=1;
 					break;
 				}
 			case 3:
 				if(keys_pressed_list[i]){
-					net_distance_sprite_x+=2;
+					net_distance_sprite_x+=1;
 					break;
 				}
 		}
