@@ -13,12 +13,6 @@ uint32_t *keys_pressed_list;
 int time_passed; 
 int frame_time = 30;
 
-Bool pressed_esc = False;
-Bool pressed_w = False;
-Bool pressed_a = False;
-Bool pressed_s = False;
-Bool pressed_d = False;
-
 int  keys_pressed_list_size = 4;
 
 struct timespec start, end;
@@ -51,7 +45,7 @@ int main(){
 	window_height = 500;
 	uint8_t border_width = 1;
 
-	keys_pressed_list = malloc(keys_pressed_list_size * sizeof(bool));
+	keys_pressed_list = malloc(keys_pressed_list_size * sizeof(Bool));
 	for(int key = 0; key < keys_pressed_list_size; key++){
 		keys_pressed_list[key] = False;
 	}	
@@ -73,39 +67,28 @@ int main(){
     32,                           // bitmap_pad (32 bits per scanline
     window_width * 4              // bytes per line (apparently also can leave it with 0 and x11 computes it)
 );
+
 	render();
 	while(1){
 		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
 		// Gather input
-		while(XPending(display)> 0){
+		while(XPending(display) > 0){
 			input_handling(display, &window , img, &event); //gain a list of inputs 
 		}
 		// Execute input
+		move(&warrior_pos);
 		// Handle frame timing
-		// draw the frame
-		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
-		while(XPending(display) > 0){ //XEventsQueued(display, QueuedAfterFlush) is identical to XPending(display)
-				input_handling(display, &window , img, &event); 
-				if(pressed_esc){
-					free(keys_pressed_list);
-					free(frame_buffer);
-					XCloseDisplay(display);	
-				}else{
-					move(&warrior_pos);
-					render();
-					XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
-				}
-		}
-		clock_gettime(CLOCK_MONOTONIC, &end);	
-
-		// Got the end time Then we start a blocking loop that checks if the time has been 33.3 ms, if not it sleeps it and if so then it creates the frame buffer and displays it 
-		time_passed = (end.tv_nsec/1000000)-(start.tv_nsec/1000000);
-		if(time_passed < frame_time * 1000000){
+		clock_gettime(CLOCK_MONOTONIC,&end);	
+		time_passed = (end.tv_nsec/1000000) - (start.tv_nsec/1000000);
+		if(time_passed<frame_time*1000000){
 			sleep_time.tv_nsec = frame_time - time_passed;
 			nanosleep(&sleep_time, NULL);
 			time_passed = 0;
-		}			
-	}
+		}
+		// draw the frame
+		render();
+		XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
+		}
 		return 1; 
 	}
 
@@ -146,23 +129,30 @@ void move(Sprite_Position *sprite){
 	float net_distance_sprite_x = 0;
 	float net_distance_sprite_y = 0;
 	for (int i = 0; i < keys_pressed_list_size; i++){
-		switch(keys_pressed_list[i]){
-			case XK_w:
-				//sprite->y = sprite-> y - 2;
-				net_distance_sprite_y-=2;
-				break;	
-			case XK_a:
+		switch(i){
+			case 0 :
+				if(keys_pressed_list[i]){
+					net_distance_sprite_y-=2;
+					break;	
+				}
+			case 1:
 				//sprite->x = sprite-> x - 2;
-				net_distance_sprite_x-=2;
-				break;
-			case XK_s:
+				if(keys_pressed_list[i]){
+					net_distance_sprite_x-=2;
+					break;
+				}
+			case 2: 
 				//sprite->y = sprite-> y + 2;
-				net_distance_sprite_y+=2;
-				break;
-			case XK_d:
+				if(keys_pressed_list[i]){
+					net_distance_sprite_y+=2;
+					break;
+				}
+			case 3:
 				//sprite->x = sprite-> x + 2;
-				net_distance_sprite_x+=2;
-				break;
+				if(keys_pressed_list[3]){
+					net_distance_sprite_x+=2;
+					break;
+				}
 		}
 	}
 	sprite->x += net_distance_sprite_x;
@@ -193,7 +183,9 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 					if (XLookupKeysym(&event->xkey, 0) != XK_Escape )  {
 						move_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
 					}else{ 
-						pressed_esc = True;
+						free(keys_pressed_list);
+						free(frame_buffer);
+						XCloseDisplay(display);	
 						return 0;
 					}
 					break;
