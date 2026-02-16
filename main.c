@@ -136,19 +136,16 @@ void move(Sprite_Position *sprite){
 					break;	
 				}
 			case 1:
-				//sprite->x = sprite-> x - 2;
 				if(keys_pressed_list[i]){
 					net_distance_sprite_x-=2;
 					break;
 				}
 			case 2: 
-				//sprite->y = sprite-> y + 2;
 				if(keys_pressed_list[i]){
 					net_distance_sprite_y+=2;
 					break;
 				}
 			case 3:
-				//sprite->x = sprite-> x + 2;
 				if(keys_pressed_list[i]){
 					net_distance_sprite_x+=2;
 					break;
