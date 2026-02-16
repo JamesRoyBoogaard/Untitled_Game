@@ -76,6 +76,14 @@ int main(){
 	render();
 	while(1){
 		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
+		// Gather input
+		while(XPending(display)> 0){
+			input_handling(display, &window , img, &event); //gain a list of inputs 
+		}
+		// Execute input
+		// Handle frame timing
+		// draw the frame
+		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
 		while(XPending(display) > 0){ //XEventsQueued(display, QueuedAfterFlush) is identical to XPending(display)
 				input_handling(display, &window , img, &event); 
 				if(pressed_esc){
@@ -135,19 +143,23 @@ void move_sprite(Sprite_Position *sprite, KeySym keysym){
 }
 
 void move(Sprite_Position *sprite){
+
+	float net_distance_sprite_x = 0;
+	float net_distance_sprite_y = 0;
 	for (int i = 0; i < keysym_array_size; i++){
 		switch(keysum_list[i]){
 			case XK_w:
-				sprite->y = sprite-> y - 5;
+				sprite->y = sprite-> y - 2;
+
 				break;	
 			case XK_a:
-				sprite->x = sprite-> x - 5;
+				sprite->x = sprite-> x - 2;
 				break;
 			case XK_s:
-				sprite->y = sprite-> y + 5;
+				sprite->y = sprite-> y + 2;
 				break;
 			case XK_d:
-				sprite->x = sprite-> x + 5;
+				sprite->x = sprite-> x + 2;
 				break;
 		}
 	}
