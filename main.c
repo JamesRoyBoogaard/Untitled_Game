@@ -9,7 +9,7 @@
 uint16_t window_width;
 uint16_t window_height;
 uint32_t *frame_buffer;
-uint32_t *keysum_list;
+uint32_t *keys_pressed_list;
 int time_passed; 
 int frame_time = 30;
 
@@ -19,7 +19,7 @@ Bool pressed_a = False;
 Bool pressed_s = False;
 Bool pressed_d = False;
 
-int keysym_array_size = 4;
+int  keys_pressed_list_size = 4;
 
 struct timespec start, end;
 struct timespec sleep_time;
@@ -51,9 +51,9 @@ int main(){
 	window_height = 500;
 	uint8_t border_width = 1;
 
-	keysum_list = malloc(keysym_array_size * sizeof(KeySym));
-	for(int key = 0; key < keysym_array_size; key++){
-		keysum_list[key] = XK_p;
+	keys_pressed_list = malloc(keys_pressed_list_size * sizeof(bool));
+	for(int key = 0; key < keys_pressed_list_size; key++){
+		keys_pressed_list[key] = False;
 	}	
 
 	Window window = XCreateSimpleWindow(display,XDefaultRootWindow(display),50,50, window_width, window_height, border_width, XBlackPixel(display, 0), XWhitePixel(display, 0));
@@ -87,7 +87,7 @@ int main(){
 		while(XPending(display) > 0){ //XEventsQueued(display, QueuedAfterFlush) is identical to XPending(display)
 				input_handling(display, &window , img, &event); 
 				if(pressed_esc){
-					free(keysum_list);
+					free(keys_pressed_list);
 					free(frame_buffer);
 					XCloseDisplay(display);	
 				}else{
@@ -128,56 +128,60 @@ void render(){
 void move_sprite(Sprite_Position *sprite, KeySym keysym){	
 	switch (keysym){
 		case XK_w:
-			keysum_list[0] = XK_w;
+			keys_pressed_list[0] = True;
 			break;
 		case XK_a:
-			keysum_list[1] = XK_a;
+			keys_pressed_list[1] = True;
 			break;
 		case XK_s:
-			keysum_list[2] = XK_s;
+			keys_pressed_list[2] = True;
 			break;
 		case XK_d:
-			keysum_list[3] = XK_d;
+			keys_pressed_list[3] = True;
 			break;
 	}
 }
 
 void move(Sprite_Position *sprite){
-
 	float net_distance_sprite_x = 0;
 	float net_distance_sprite_y = 0;
-	for (int i = 0; i < keysym_array_size; i++){
-		switch(keysum_list[i]){
+	for (int i = 0; i < keys_pressed_list_size; i++){
+		switch(keys_pressed_list[i]){
 			case XK_w:
-				sprite->y = sprite-> y - 2;
-
+				//sprite->y = sprite-> y - 2;
+				net_distance_sprite_y-=2;
 				break;	
 			case XK_a:
-				sprite->x = sprite-> x - 2;
+				//sprite->x = sprite-> x - 2;
+				net_distance_sprite_x-=2;
 				break;
 			case XK_s:
-				sprite->y = sprite-> y + 2;
+				//sprite->y = sprite-> y + 2;
+				net_distance_sprite_y+=2;
 				break;
 			case XK_d:
-				sprite->x = sprite-> x + 2;
+				//sprite->x = sprite-> x + 2;
+				net_distance_sprite_x+=2;
 				break;
 		}
 	}
+	sprite->x += net_distance_sprite_x;
+	sprite->y += net_distance_sprite_y; 
 }
 
 void stop_moving_sprite(Sprite_Position *sprite, KeySym keysym){
 	switch (keysym){
 		case XK_w:
-			keysum_list[0] = XK_p;
+			keys_pressed_list[0] = False;
 			break;
 		case XK_a:
-			keysum_list[1] = XK_p;
+			keys_pressed_list[1] = False;
 			break;
 		case XK_s:
-			keysum_list[2] = XK_p;
+			keys_pressed_list[2] = False;
 			break;
 		case XK_d:
-			keysum_list[3] = XK_p;
+			keys_pressed_list[3] = False;
 			break;
 	}
 }
@@ -193,11 +197,9 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 						return 0;
 					}
 					break;
-
 				case KeyRelease:
 					stop_moving_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
 					break;
-
 				case Expose:
 					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 					break;
