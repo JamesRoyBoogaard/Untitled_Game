@@ -12,7 +12,7 @@ uint32_t *frame_buffer;
 uint32_t *keys_pressed_list;
 int time_passed; 
 const long frame_time = 33333333;
-
+Bool pressed_esc;
 int  keys_pressed_list_size = 4;
 
 struct timespec start, end;
@@ -31,7 +31,7 @@ Bool draw_sprite(uint16_t x_pos, uint16_t y_pos);
 void move_sprite(Sprite_Position *sprite_pos, KeySym keysym);
 void stop_moving_sprite(Sprite_Position *sprite_pos, KeySym keysym);
 void render();
-uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *event);
+Bool input_handling(Display *display, Window *window, XImage *img, XEvent *event);
 void move(Sprite_Position *sprite_pos);
 
 int main(){
@@ -70,25 +70,33 @@ int main(){
 
 	render();
 	while(1){
+		pressed_esc = False;
 		clock_gettime(CLOCK_MONOTONIC, &start); //  Got the start time here
 		// Gather input
 		while(XPending(display) > 0){
-			input_handling(display, &window , img, &event);  
+			 pressed_esc =	input_handling(display, &window , img, &event);  
 		}
-		// Execute input
-		move(&warrior_pos);
-		// Handle frame timing
-		clock_gettime(CLOCK_MONOTONIC,&end);	
-		time_passed = (end.tv_sec - start.tv_sec)*1000000000 + (end.tv_nsec - start.tv_nsec);
-		if(time_passed<frame_time){
-			sleep_time.tv_sec = 0;
-			sleep_time.tv_nsec = frame_time - time_passed;
-			nanosleep(&sleep_time, NULL);
-			time_passed = 0;
+		if(pressed_esc){
+						free(keys_pressed_list);
+						free(frame_buffer);
+						XCloseDisplay(display);	
+						exit(0);
+		}else{
+			// Execute input
+			move(&warrior_pos);
+			// Handle frame timing
+			clock_gettime(CLOCK_MONOTONIC,&end);	
+			time_passed = (end.tv_sec - start.tv_sec)*1000000000 + (end.tv_nsec - start.tv_nsec);
+			if(time_passed<frame_time){
+				sleep_time.tv_sec = 0;
+				sleep_time.tv_nsec = frame_time - time_passed;
+				nanosleep(&sleep_time, NULL);
+				time_passed = 0;
+			}
+			// draw the frame
+			render();
+			XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 		}
-		// draw the frame
-		render();
-		XPutImage(display, window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 		}
 		return 1; 
 	}
@@ -174,17 +182,14 @@ void stop_moving_sprite(Sprite_Position *sprite, KeySym keysym){
 	}
 }
 
-uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *event){
+Bool input_handling(Display *display, Window *window, XImage *img, XEvent *event){
 			XNextEvent(display, event); 
 			switch (event->type) {
 				case KeyPress:
 					if (XLookupKeysym(&event->xkey, 0) != XK_Escape )  {
 						move_sprite(&warrior_pos, XLookupKeysym(&event->xkey, 0));
 					}else{ 
-						free(keys_pressed_list);
-						free(frame_buffer);
-						XCloseDisplay(display);	
-						return 0;
+						return True;
 					}
 					break;
 				case KeyRelease:
@@ -194,7 +199,7 @@ uint8_t input_handling(Display *display, Window *window, XImage *img, XEvent *ev
 					XPutImage(display, *window, XDefaultGC(display, 0), img, 0, 0, 0, 0, window_width, window_height);	
 					break;
 			}
-			return 0;
+			return False;
 }
 
 Bool draw_sprite(uint16_t x_pos, uint16_t y_pos){ 
