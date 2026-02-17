@@ -11,7 +11,7 @@ uint16_t window_height;
 uint32_t *frame_buffer;
 uint32_t *keys_pressed_list;
 int time_passed; 
-const long frame_time = 33333333;
+const long frame_time = 33333333; //If we going 60 fps the change this to 16666666.5
 Bool pressed_esc;
 int  keys_pressed_list_size = 4;
 
